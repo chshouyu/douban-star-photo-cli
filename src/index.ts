@@ -53,6 +53,8 @@ class DoubanStarPhotoCli extends Command {
     console.log(`total photos pages: ${chalk.green(totalPages)}\n`);
     console.log(`The photos will save in:\n${photoSavePath}\n`);
 
+    fsx.ensureDirSync(photoSavePath);
+
     const progressBar = cli.progress({
       format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
     });
@@ -112,8 +114,6 @@ class DoubanStarPhotoCli extends Command {
   }
 
   async downloadPhoto(photoUrl: string, photoSavePath: string): Promise<void> {
-    fsx.ensureDirSync(photoSavePath);
-
     const res = await axios.get(photoUrl, { responseType: 'text' });
 
     const $ = cheerio.load(res.data);
