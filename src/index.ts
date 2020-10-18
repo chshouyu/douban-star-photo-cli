@@ -54,7 +54,7 @@ class DoubanStarPhotoCli extends Command {
     progressBar.start(photosCount, 0);
 
     for (let i = 0; i < totalPages; i++) {
-      const links = await this.getPhotoLinksFromEachPage(i + 1);
+      const links = await this.getPhotoLinksFromEachPage(answers.code, i + 1);
       for (let j = 0; j < links.length; j++) {
         const link = links[j];
         try {
@@ -91,8 +91,8 @@ class DoubanStarPhotoCli extends Command {
     return { starName, photosCount: Number(countMatch[0]), totalPages: Number(totalPages) };
   }
 
-  async getPhotoLinksFromEachPage(pageNum: number): Promise<string[]> {
-    const pageUrl = `https://movie.douban.com/celebrity/1022821/photos/?type=C&start=${
+  async getPhotoLinksFromEachPage(starCode: string, pageNum: number): Promise<string[]> {
+    const pageUrl = `https://movie.douban.com/celebrity/${starCode}/photos/?type=C&start=${
       (pageNum - 1) * 30
     }&sortby=like&size=a&subtype=a`;
     const res = await axios.get(pageUrl, { responseType: 'text' });
