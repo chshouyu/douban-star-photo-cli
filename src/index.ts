@@ -67,8 +67,8 @@ class DoubanStarPhotoCli extends Command {
         const link = links[j];
         try {
           const curr = i * 30 + j + 1;
-          progressBar.update(curr);
           await this.downloadPhoto(link, photoSavePath);
+          progressBar.update(curr);
         } catch (e) {
           console.error(chalk.red(e?.message));
         }
