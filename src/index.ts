@@ -6,6 +6,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import chalk from 'chalk';
 import cli from 'cli-ux';
+import untildify from 'untildify';
 
 class DoubanStarPhotoCli extends Command {
   static description = 'download douban star photos';
@@ -41,11 +42,16 @@ class DoubanStarPhotoCli extends Command {
       }
     ]);
 
+    const photoSavePath = path.isAbsolute(answers.path)
+      ? answers.path
+      : path.resolve(untildify(answers.path));
+
     const { starName, photosCount, totalPages } = await this.getStarPhotosInfo(answers.code);
 
     console.log(`\nfind star name: ${chalk.green(starName)}`);
     console.log(`total photos count: ${chalk.green(photosCount)}`);
     console.log(`total photos pages: ${chalk.green(totalPages)}\n`);
+    console.log(`The photos will save in:\n${photoSavePath}\n`);
 
     const progressBar = cli.progress({
       format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
@@ -60,7 +66,7 @@ class DoubanStarPhotoCli extends Command {
         try {
           const curr = i * 30 + j + 1;
           progressBar.update(curr);
-          await this.downloadPhoto(link, answers.path);
+          await this.downloadPhoto(link, photoSavePath);
         } catch (e) {
           console.error(chalk.red(e?.message));
         }
@@ -119,7 +125,7 @@ class DoubanStarPhotoCli extends Command {
 
     const photoFileName = path.basename(imageUrl);
     const imageRes = await axios.get<ReadStream>(imageUrl, { responseType: 'stream' });
-    const writer = fsx.createWriteStream(`${photoSavePath}/${photoFileName}`);
+    const writer = fsx.createWriteStream(path.join(photoSavePath, photoFileName));
 
     await this.savePhotoFile(imageRes.data, writer);
   }
