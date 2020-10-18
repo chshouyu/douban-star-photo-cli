@@ -5,6 +5,7 @@ import fsx, { ReadStream, WriteStream } from 'fs-extra';
 import axios from 'axios';
 import cheerio from 'cheerio';
 import chalk from 'chalk';
+import cli from 'cli-ux';
 
 class DoubanStarPhotoCli extends Command {
   static description = 'download douban star photos';
@@ -44,20 +45,29 @@ class DoubanStarPhotoCli extends Command {
 
     console.log(`\nfind star name: ${chalk.green(starName)}`);
     console.log(`total photos count: ${chalk.green(photosCount)}`);
-    console.log(`total photos pages: ${chalk.green(totalPages)}`);
+    console.log(`total photos pages: ${chalk.green(totalPages)}\n`);
+
+    const progressBar = cli.progress({
+      format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
+    });
+
+    progressBar.start(photosCount, 0);
 
     for (let i = 0; i < totalPages; i++) {
       const links = await this.getPhotoLinksFromEachPage(i + 1);
       for (let j = 0; j < links.length; j++) {
         const link = links[j];
         try {
-          console.log(`start downloading photo ${i * 30 + j + 1} / ${photosCount}`);
+          const curr = i * 30 + j + 1;
+          progressBar.update(curr);
           await this.downloadPhoto(link, answers.path);
         } catch (e) {
           console.error(chalk.red(e?.message));
         }
       }
     }
+
+    progressBar.stop();
   }
 
   async getStarPhotosInfo(
