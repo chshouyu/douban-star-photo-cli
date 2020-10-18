@@ -10,7 +10,13 @@
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
+    "@types/cheerio": "^0.22.22",
+    "@types/fs-extra": "^9.0.2",
     "@types/inquirer": "^7.3.1",
+    "axios": "^0.20.0",
+    "chalk": "^4.1.0",
+    "cheerio": "^1.0.0-rc.3",
+    "fs-extra": "^9.0.1",
     "inquirer": "^7.3.3",
     "tslib": "^2.0.3"
   },
