@@ -1,28 +1,41 @@
 import { Command, flags } from '@oclif/command';
+import * as inquirer from 'inquirer';
 
 class DoubanStarPhotoCli extends Command {
-  static description = 'describe the command here';
+  static description = 'download douban star photos';
 
   static flags = {
     // add --version flag to show CLI version
     version: flags.version({ char: 'v' }),
-    help: flags.help({ char: 'h' }),
-    // flag with a value (-n, --name=VALUE)
-    name: flags.string({ char: 'n', description: 'name to print' }),
-    // flag with no value (-f, --force)
-    force: flags.boolean({ char: 'f' })
+    help: flags.help({ char: 'h' })
   };
 
-  static args = [{ name: 'file' }];
-
   async run(): Promise<void> {
-    const { args, flags } = this.parse(DoubanStarPhotoCli);
+    const answers = await inquirer.prompt<{ code: string; path: string }>([
+      {
+        name: 'code',
+        message: 'input star code:',
+        validate: (input: string) => {
+          if (!input || !/\d+/.test(input)) {
+            return 'please input valid star code';
+          }
+          return true;
+        }
+      },
+      {
+        name: 'path',
+        message: 'input photos save path:',
+        default: process.cwd(),
+        validate: (input: string) => {
+          if (!input) {
+            return 'please input valid photos path';
+          }
+          return true;
+        }
+      }
+    ]);
 
-    const name = flags.name ?? 'world';
-    this.log(`hello ${name} from ./src/index.ts`);
-    if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`);
-    }
+    // console.log(answers);
   }
 }
 
