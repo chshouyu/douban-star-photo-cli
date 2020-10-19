@@ -36,6 +36,12 @@ class DoubanStarPhotoCli extends Command {
       return this._help();
     }
 
+    if (fsx.existsSync(photoSavePath) && !fsx.statSync(photoSavePath).isDirectory()) {
+      throw new Error(`${photoSavePath} is not a directory`);
+    } else if (!fsx.existsSync(photoSavePath)) {
+      fsx.ensureDirSync(photoSavePath);
+    }
+
     const answers = await inquirer.prompt<{ code: string; path: string }>([
       {
         name: 'code',
@@ -55,8 +61,6 @@ class DoubanStarPhotoCli extends Command {
     console.log(`total photos count: ${chalk.green(photosCount)}`);
     console.log(`total photos pages: ${chalk.green(totalPages)}\n`);
     console.log(`The photos will save in:\n${photoSavePath}\n`);
-
-    fsx.ensureDirSync(photoSavePath);
 
     const progressBar = cli.progress({
       format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
