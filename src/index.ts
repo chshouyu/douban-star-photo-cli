@@ -57,9 +57,9 @@ class DoubanStarPhotoCli extends Command {
 
     const { starName, photosCount, totalPages } = await this.getStarPhotosInfo(answers.code);
 
-    console.log(`\nfind star name: ${chalk.green(starName)}`);
-    console.log(`total photos count: ${chalk.green(photosCount)}`);
-    console.log(`total photos pages: ${chalk.green(totalPages)}\n`);
+    console.log(`\nFind star name: ${chalk.green(starName)}`);
+    console.log(`Total photos count: ${chalk.green(photosCount)}`);
+    console.log(`Total photos pages: ${chalk.green(totalPages)}\n`);
     console.log(`The photos will save in:\n${photoSavePath}\n`);
 
     const progressBar = cli.progress({
