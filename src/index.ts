@@ -37,7 +37,7 @@ class DoubanStarPhotoCli extends Command {
     }
 
     if (fsx.existsSync(photoSavePath) && !fsx.statSync(photoSavePath).isDirectory()) {
-      throw new Error(`${photoSavePath} is not a directory`);
+      throw new Error(`\n${photoSavePath} is not a directory`);
     } else if (!fsx.existsSync(photoSavePath)) {
       fsx.ensureDirSync(photoSavePath);
     }
