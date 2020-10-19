@@ -11,6 +11,16 @@ import untildify from 'untildify';
 class DoubanStarPhotoCli extends Command {
   static description = 'download douban star photos';
 
+  static args = [
+    {
+      name: 'path',
+      description: 'photos save path',
+      parse: (input: string): string => {
+        return path.isAbsolute(input) ? input : path.resolve(untildify(input));
+      }
+    }
+  ];
+
   static flags = {
     // add --version flag to show CLI version
     version: flags.version({ char: 'v' }),
@@ -18,6 +28,14 @@ class DoubanStarPhotoCli extends Command {
   };
 
   async run(): Promise<void> {
+    const {
+      args: { path: photoSavePath }
+    } = this.parse(DoubanStarPhotoCli);
+
+    if (!photoSavePath) {
+      return this._help();
+    }
+
     const answers = await inquirer.prompt<{ code: string; path: string }>([
       {
         name: 'code',
@@ -28,23 +46,8 @@ class DoubanStarPhotoCli extends Command {
           }
           return true;
         }
-      },
-      {
-        name: 'path',
-        message: 'input photos save path:',
-        default: process.cwd(),
-        validate: (input: string) => {
-          if (!input) {
-            return 'please input valid photos path';
-          }
-          return true;
-        }
       }
     ]);
-
-    const photoSavePath = path.isAbsolute(answers.path)
-      ? answers.path
-      : path.resolve(untildify(answers.path));
 
     const { starName, photosCount, totalPages } = await this.getStarPhotosInfo(answers.code);
 
