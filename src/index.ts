@@ -42,20 +42,28 @@ class DoubanStarPhotoCli extends Command {
       fsx.ensureDirSync(photoSavePath);
     }
 
-    const answers = await inquirer.prompt<{ code: string; path: string }>([
-      {
-        name: 'code',
-        message: 'input star code:',
-        validate: (input: string) => {
-          if (!input || !/\d+/.test(input)) {
-            return 'please input valid star code';
+    const { code, ignoreExisted } = await inquirer.prompt<{ code: string; ignoreExisted: boolean }>(
+      [
+        {
+          name: 'code',
+          message: 'input star code:',
+          validate: (input: string) => {
+            if (!input || !/\d+/.test(input)) {
+              return 'please input valid star code';
+            }
+            return true;
           }
-          return true;
+        },
+        {
+          name: 'ignoreExisted',
+          message: 'ignore existing photos:',
+          type: 'confirm',
+          default: true
         }
-      }
-    ]);
+      ]
+    );
 
-    const { starName, photosCount, totalPages } = await this.getStarPhotosInfo(answers.code);
+    const { starName, photosCount, totalPages } = await this.getStarPhotosInfo(code);
 
     console.log(`\nFind star name: ${chalk.green(starName)}`);
     console.log(`Total photos count: ${chalk.green(photosCount)}`);
@@ -69,12 +77,12 @@ class DoubanStarPhotoCli extends Command {
     progressBar.start(photosCount, 0);
 
     for (let i = 0; i < totalPages; i++) {
-      const links = await this.getPhotoLinksFromEachPage(answers.code, i + 1);
+      const links = await this.getPhotoLinksFromEachPage(code, i + 1);
       for (let j = 0; j < links.length; j++) {
         const link = links[j];
         try {
           const curr = i * 30 + j + 1;
-          await this.downloadPhoto(link, photoSavePath);
+          await this.downloadPhoto(link, photoSavePath, ignoreExisted);
           progressBar.update(curr);
         } catch (e) {
           console.error(chalk.red(e?.message));
@@ -120,7 +128,11 @@ class DoubanStarPhotoCli extends Command {
     return links;
   }
 
-  async downloadPhoto(photoUrl: string, photoSavePath: string): Promise<void> {
+  async downloadPhoto(
+    photoUrl: string,
+    photoSavePath: string,
+    ignoreExisted: boolean
+  ): Promise<void> {
     const res = await axios.get(photoUrl, { responseType: 'text' });
 
     const $ = cheerio.load(res.data);
@@ -129,10 +141,15 @@ class DoubanStarPhotoCli extends Command {
     if (!imageUrl) {
       throw new Error('image not found');
     }
-
     const photoFileName = path.basename(imageUrl);
+    const photoPath = path.join(photoSavePath, photoFileName);
+
+    if (ignoreExisted && fsx.existsSync(photoPath)) {
+      return;
+    }
+
     const imageRes = await axios.get<ReadStream>(imageUrl, { responseType: 'stream' });
-    const writer = fsx.createWriteStream(path.join(photoSavePath, photoFileName));
+    const writer = fsx.createWriteStream(photoPath);
 
     await this.savePhotoFile(imageRes.data, writer);
   }
