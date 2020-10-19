@@ -1,8 +1,8 @@
-- [ ] 保存路径作为参数
 - [ ] 跳过已存在的文件
 - [ ] 检查目标路径是否为空，确认覆盖
 - [ ] 图片大小筛选
 - [ ] 图片格式筛选、类型选择
 - [ ] 并行下载
 - [ ] 保存路径确认
-- [ ] full path in inquirer transform
+- [x] 保存路径作为参数
+- [x] full path in inquirer transform
