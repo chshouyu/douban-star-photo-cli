@@ -70,27 +70,17 @@ class DoubanStarPhotoCli extends Command {
     console.log(`Total photos pages: ${chalk.green(totalPages)}\n`);
     console.log(`The photos will save in:\n${photoSavePath}\n`);
 
-    const progressBar = cli.progress({
-      format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
-    });
+    const [allPhotos, pageErrors] = await this.collectAllPhotos(code, totalPages);
 
-    progressBar.start(photosCount, 0);
-
-    for (let i = 0; i < totalPages; i++) {
-      const photos = await this.getPhotosFromEachPage(code, i + 1);
-      for (let j = 0; j < photos.length; j++) {
-        const photo = photos[j];
-        try {
-          const curr = i * 30 + j + 1;
-          await this.downloadPhoto(photo, photoSavePath, ignoreExisted);
-          progressBar.update(curr);
-        } catch (e) {
-          console.error(chalk.red(e?.message));
-        }
-      }
+    if (pageErrors.length) {
+      console.error(`\nError:\n${pageErrors.join('\n')}\n`);
     }
 
-    progressBar.stop();
+    const downloadErrors = await this.downloadAllPhotos(allPhotos, photoSavePath, ignoreExisted);
+
+    if (downloadErrors.length) {
+      console.error(`\nError:\n${downloadErrors.join('\n')}\n`);
+    }
   }
 
   async getStarPhotosInfo(
@@ -126,6 +116,63 @@ class DoubanStarPhotoCli extends Command {
       .get();
 
     return images;
+  }
+
+  async collectAllPhotos(code: string, totalPages: number): Promise<[string[], string[]]> {
+    console.log('Collecting all photos from each page...');
+
+    const allPhotos: string[] = [];
+    const errors: string[] = [];
+
+    const progressBar = cli.progress({
+      format: 'collecting... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
+    });
+
+    progressBar.start(totalPages, 0);
+
+    for (let i = 0; i < totalPages; i++) {
+      try {
+        const photos = await this.getPhotosFromEachPage(code, i + 1);
+        allPhotos.push(...photos);
+      } catch (e) {
+        errors.push(chalk.red(`page ${i + 1} error: ${e?.message}`));
+      }
+      progressBar.increment();
+    }
+
+    progressBar.stop();
+
+    return [allPhotos, errors];
+  }
+
+  async downloadAllPhotos(
+    allPhotos: string[],
+    photoSavePath: string,
+    ignoreExisted: boolean
+  ): Promise<string[]> {
+    console.log('\nDownloading all photos...');
+
+    const errors: string[] = [];
+
+    const progressBar = cli.progress({
+      format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
+    });
+
+    progressBar.start(allPhotos.length, 0);
+
+    for (let j = 0; j < allPhotos.length; j++) {
+      const photo = allPhotos[j];
+      try {
+        await this.downloadPhoto(photo, photoSavePath, ignoreExisted);
+      } catch (e) {
+        errors.push(chalk.red(`${photo} error: ${e?.message}`));
+      }
+      progressBar.increment();
+    }
+
+    progressBar.stop();
+
+    return errors;
   }
 
   async downloadPhoto(
