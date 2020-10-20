@@ -7,6 +7,7 @@ import cheerio from 'cheerio';
 import chalk from 'chalk';
 import cli from 'cli-ux';
 import untildify from 'untildify';
+import range from 'lodash.range';
 
 class DoubanStarPhotoCli extends Command {
   static description = 'download douban star photos';
@@ -130,14 +131,17 @@ class DoubanStarPhotoCli extends Command {
 
     progressBar.start(totalPages, 0);
 
-    for (let i = 0; i < totalPages; i++) {
+    for (let i = 0; i < totalPages; i += 2) {
+      const pagesRange = range(i, Math.min(i + 2, totalPages));
       try {
-        const photos = await this.getPhotosFromEachPage(code, i + 1);
-        allPhotos.push(...photos);
+        const photos = await Promise.all(
+          pagesRange.map((page) => this.getPhotosFromEachPage(code, page + 1))
+        );
+        allPhotos.push(...photos.reduce((array, photos) => [...array, ...photos], []));
       } catch (e) {
-        errors.push(chalk.red(`page ${i + 1} error: ${e?.message}`));
+        errors.push(chalk.red(`error: ${e?.message}`));
       }
-      progressBar.increment();
+      progressBar.update(Math.min(i + 2, totalPages));
     }
 
     progressBar.stop();
