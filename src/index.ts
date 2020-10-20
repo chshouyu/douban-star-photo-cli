@@ -77,12 +77,12 @@ class DoubanStarPhotoCli extends Command {
     progressBar.start(photosCount, 0);
 
     for (let i = 0; i < totalPages; i++) {
-      const links = await this.getPhotoLinksFromEachPage(code, i + 1);
-      for (let j = 0; j < links.length; j++) {
-        const link = links[j];
+      const photos = await this.getPhotosFromEachPage(code, i + 1);
+      for (let j = 0; j < photos.length; j++) {
+        const photo = photos[j];
         try {
           const curr = i * 30 + j + 1;
-          await this.downloadPhoto(link, photoSavePath, ignoreExisted);
+          await this.downloadPhoto(photo, photoSavePath, ignoreExisted);
           progressBar.update(curr);
         } catch (e) {
           console.error(chalk.red(e?.message));
@@ -114,18 +114,18 @@ class DoubanStarPhotoCli extends Command {
     return { starName, photosCount: Number(countMatch[0]), totalPages: Number(totalPages) };
   }
 
-  async getPhotoLinksFromEachPage(starCode: string, pageNum: number): Promise<string[]> {
+  async getPhotosFromEachPage(starCode: string, pageNum: number): Promise<string[]> {
     const pageUrl = `https://movie.douban.com/celebrity/${starCode}/photos/?type=C&start=${
       (pageNum - 1) * 30
     }&sortby=like&size=a&subtype=a`;
     const res = await axios.get(pageUrl, { responseType: 'text' });
 
     const $ = cheerio.load(res.data);
-    const links = $('.cover a')
-      .map((_, item) => $(item).attr('href'))
+    const images = $('.cover a img')
+      .map((_, img) => $(img).attr('src'))
       .get();
 
-    return links;
+    return images;
   }
 
   async downloadPhoto(
@@ -133,22 +133,15 @@ class DoubanStarPhotoCli extends Command {
     photoSavePath: string,
     ignoreExisted: boolean
   ): Promise<void> {
-    const res = await axios.get(photoUrl, { responseType: 'text' });
-
-    const $ = cheerio.load(res.data);
-    const imageUrl = $('.mainphoto img').attr('src');
-
-    if (!imageUrl) {
-      throw new Error('image not found');
-    }
-    const photoFileName = path.basename(imageUrl);
+    const newPhotoUrl = photoUrl.replace('/m/', '/l/');
+    const photoFileName = path.basename(newPhotoUrl);
     const photoPath = path.join(photoSavePath, photoFileName);
 
     if (ignoreExisted && fsx.existsSync(photoPath)) {
       return;
     }
 
-    const imageRes = await axios.get<ReadStream>(imageUrl, { responseType: 'stream' });
+    const imageRes = await axios.get<ReadStream>(newPhotoUrl, { responseType: 'stream' });
     const writer = fsx.createWriteStream(photoPath);
 
     await this.savePhotoFile(imageRes.data, writer);
