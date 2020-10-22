@@ -5,7 +5,6 @@
   "bin": {
     "douban-star-photo": "./bin/run"
   },
-  "bugs": "https://github.com/chshouyu/douban-star-photo-cli/issues",
   "dependencies": {
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
@@ -48,7 +47,6 @@
     "/bin",
     "/lib"
   ],
-  "homepage": "https://github.com/chshouyu/douban-star-photo-cli",
   "keywords": [
     "oclif"
   ],
@@ -57,7 +55,6 @@
   "oclif": {
     "bin": "douban-star-photo"
   },
-  "repository": "chshouyu/douban-star-photo-cli",
   "scripts": {
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
