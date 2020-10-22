@@ -71,6 +71,10 @@ class DoubanStarPhotoCli extends Command {
     console.log(`Total photos pages: ${chalk.green(totalPages)}\n`);
     console.log(`The photos will save in:\n${photoSavePath}\n`);
 
+    if (!photosCount) {
+      return console.error(chalk.red('no photo found'));
+    }
+
     const [allPhotos, pageErrors] = await this.collectAllPhotos(code, totalPages);
 
     if (pageErrors.length) {
@@ -92,17 +96,15 @@ class DoubanStarPhotoCli extends Command {
 
     const $ = cheerio.load(res.data);
     const starName = $('#content h1').text().replace('的图片', '');
+    const totalPagesText = $('[data-total-page]').attr('data-total-page');
     const photosCountText = $('.count').text();
 
     const countMatch = photosCountText.match(/\d+/);
 
-    if (!countMatch) {
-      throw new Error('invalid photo count');
-    }
+    const photosCount = countMatch ? Number(countMatch[0]) : $('.cover a img').length;
+    const totalPages = countMatch ? Number(totalPagesText) : photosCount > 0 ? 1 : 0;
 
-    const totalPages = $('[data-total-page]').attr('data-total-page');
-
-    return { starName, photosCount: Number(countMatch[0]), totalPages: Number(totalPages) };
+    return { starName, photosCount, totalPages };
   }
 
   async getPhotosFromEachPage(starCode: string, pageNum: number): Promise<string[]> {
