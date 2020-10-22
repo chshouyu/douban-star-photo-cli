@@ -49,7 +49,8 @@
     "demo.gif"
   ],
   "keywords": [
-    "oclif"
+    "douban",
+    "cli"
   ],
   "license": "MIT",
   "main": "lib/index.js",

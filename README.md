@@ -4,7 +4,7 @@
 
 ## 示例
 
-![demo](demo.gif)
+![demo](https://tva1.sinaimg.cn/large/0081Kckwly1gjyq2rodn2g31ha0l877h.gif)
 
 ## 安装
 
