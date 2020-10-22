@@ -6,6 +6,12 @@
 
 ![demo](demo.gif)
 
+## 安装
+
+```bash
+$ npm i douban-star-photo-cli
+```
+
 ## 使用
 
 执行
