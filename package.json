@@ -1,6 +1,6 @@
 {
   "name": "douban-star-photo-cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "chshouyu @chshouyu",
   "bin": {
     "douban-star-photo": "./bin/run"
