@@ -9,7 +9,7 @@
 ## 安装
 
 ```bash
-$ npm i douban-star-photo-cli
+$ npm i -g douban-star-photo-cli
 ```
 
 ## 使用
