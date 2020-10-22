@@ -45,7 +45,8 @@
   },
   "files": [
     "/bin",
-    "/lib"
+    "/lib",
+    "demo.gif"
   ],
   "keywords": [
     "oclif"
