@@ -92,7 +92,7 @@ class DoubanStarPhotoCli extends Command {
     starId: string
   ): Promise<{ starName: string; photosCount: number; totalPages: number }> {
     const starHomePage = `https://movie.douban.com/celebrity/${starId}/photos`;
-    const res = await axios.get(starHomePage, { responseType: 'text' });
+    const res = await axios.get<string>(starHomePage, { responseType: 'text' });
 
     const $ = cheerio.load(res.data);
     const starName = $('#content h1').text().replace('的图片', '');
@@ -111,7 +111,7 @@ class DoubanStarPhotoCli extends Command {
     const pageUrl = `https://movie.douban.com/celebrity/${starCode}/photos/?type=C&start=${
       (pageNum - 1) * 30
     }&sortby=like&size=a&subtype=a`;
-    const res = await axios.get(pageUrl, { responseType: 'text' });
+    const res = await axios.get<string>(pageUrl, { responseType: 'text' });
 
     const $ = cheerio.load(res.data);
     const images = $('.cover a img')
