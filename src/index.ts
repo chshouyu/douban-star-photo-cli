@@ -18,19 +18,19 @@ class DoubanStarPhotoCli extends Command {
       description: 'photos save path',
       parse: (input: string): string => {
         return path.isAbsolute(input) ? input : path.resolve(untildify(input));
-      }
-    }
+      },
+    },
   ];
 
   static flags = {
     // add --version flag to show CLI version
     version: flags.version({ char: 'v' }),
-    help: flags.help({ char: 'h' })
+    help: flags.help({ char: 'h' }),
   };
 
   async run(): Promise<void> {
     const {
-      args: { path: photoSavePath }
+      args: { path: photoSavePath },
     } = this.parse(DoubanStarPhotoCli);
 
     if (!photoSavePath) {
@@ -53,14 +53,14 @@ class DoubanStarPhotoCli extends Command {
               return 'please input valid star code';
             }
             return true;
-          }
+          },
         },
         {
           name: 'ignoreExisted',
           message: 'ignore existing photos:',
           type: 'confirm',
-          default: true
-        }
+          default: true,
+        },
       ]
     );
 
@@ -128,7 +128,7 @@ class DoubanStarPhotoCli extends Command {
     const errors: string[] = [];
 
     const progressBar = cli.progress({
-      format: 'collecting... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
+      format: 'collecting... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}',
     });
 
     progressBar.start(totalPages, 0);
@@ -161,7 +161,7 @@ class DoubanStarPhotoCli extends Command {
     const errors: string[] = [];
 
     const progressBar = cli.progress({
-      format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
+      format: 'downloading... [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}',
     });
 
     progressBar.start(allPhotos.length, 0);

@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
   env: {
     es6: true,
-    node: true
+    node: true,
   },
   parser: '@typescript-eslint/parser',
   extends: [
@@ -13,14 +13,14 @@ module.exports = {
     'plugin:node/recommended',
     'plugin:promise/recommended',
     'plugin:prettier/recommended',
-    'prettier/@typescript-eslint'
+    'prettier/@typescript-eslint',
   ],
   plugins: [],
   parserOptions: {
     project: path.resolve(__dirname, './tsconfig.eslint.json'),
     tsconfigRootDir: __dirname,
     ecmaVersion: 2020,
-    sourceType: 'module'
+    sourceType: 'module',
   },
   settings: {},
   globals: {},
@@ -33,8 +33,8 @@ module.exports = {
     'node/no-missing-import': [
       'error',
       {
-        tryExtensions: ['.ts', '.js', '.json']
-      }
-    ]
-  }
+        tryExtensions: ['.ts', '.js', '.json'],
+      },
+    ],
+  },
 };
