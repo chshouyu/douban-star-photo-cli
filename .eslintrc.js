@@ -13,7 +13,6 @@ module.exports = {
     'plugin:node/recommended',
     'plugin:promise/recommended',
     'plugin:prettier/recommended',
-    'prettier/@typescript-eslint',
   ],
   plugins: [],
   parserOptions: {
